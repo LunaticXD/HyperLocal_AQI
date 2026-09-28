@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Air Quality Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #58a6ff;
+    }
+    .sensor-card {
+      display: inline-block;
+      background: #161b22;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 10px;
+      width: 180px;
+      box-shadow: 0 0 10px #30363d;
+    }
+    .value {
+      font-size: 1.5em;
+      color: #79c0ff;
+    }
+    .timestamp {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌍 Live Air Quality Monitor</h1>
+  <div id="sensor-container"></div>
+  <div class="timestamp" id="timestamp">Loading...</div>
+
+  <script>
+    async function fetchData() {
+      const res = await fetch('/data');
+      const data = await res.json();
+
+      const sensors = [
+        'temperature', 'humidity', 'LPG', 'CH4', 'CO',
+        'Benzene', 'SO2', 'NH3', 'CO2', 'AQI'
+      ];
+
+      let html = '';
+      sensors.forEach(sensor => {
+        const val = data[sensor] ?? '—';
+        html += `
+          <div class="sensor-card">
+            <h3>${sensor.toUpperCase()}</h3>
+            <div class="value">${val}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById('sensor-container').innerHTML = html;
+      document.getElementById('timestamp').textContent =
+        "Last Updated: " + (data.timestamp || "—");
+    }
+
+    fetchData();
+    setInterval(fetchData, 3000); // refresh every 3 sec
+  </script>
+</body>
+</html>
